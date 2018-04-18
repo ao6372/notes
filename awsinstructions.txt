@@ -1,0 +1,79 @@
+
+Webserver: Setting up AWS EC2
+
+How to create a new EC2 Instance as a webserver:
+1. EC2 Dashboard, click on Launch Instance button
+2. Choose Ubuntu Server (Free Tier eligible one)
+3. Choose the Free Tier eligible type and click on Configure Instance Details button
+4. Check 'Protect against accidental termination'  so it’s enabled. Click add Storage button
+5. Add as much as you can for free or 30 GB. Click Add Tags button
+6. Again, click Add Tag button (bottom left). Key (set to Name), Value to whatever you’d like. Click  'Configure Security Group' button
+7. Click 'Add Rule' button.
+    * From Type dropdown, select 'HTTP'
+    * Change the name on the Security group name to something like 'All TCP and HTTP'
+    * Click Review and Launch button.
+8. A popup will ask you to 'Select an existing key pair or create a new key pair'
+    * Easier to create a new pair.
+    * Download it
+    * Save it to ~/.ssh directory
+    * Click Launch Instance button
+    * This will launch your instance.
+
+Once AWS EC2 instance is launched
+1. Move the .pem file to ~/.ssh directory
+2. open config file and create a new entry for the AWS EC2 instance
+
+Once in AWS EC2 Ubuntu instance 
+1. ssh [name of the instance]
+2. sudo apt update —updates the references to where packages are acquired
+3. sudo apt upgrade — update all packages in the system
+4. which python3 — check to see if python 3 is installed
+5. wget [link to anaconda download for lsudeinux]
+6. Once downloaded run the script by:
+    * bash [name of the download file]
+    * Press 'q' to get out of more
+    * Do you wish the installer to prepend the Anaconda3 install location to PATH in your /home/ubuntu/.bashrc ? [yes|no]
+    * Make sure you type 'yes'  to this question
+7. In order for the path to be established in my session, exit and get back in.
+    * exit from ssh
+8. ssh [name of the instance]
+    * now echo $PATH should have the correct anaconda path
+9. Need to install flask
+    * conda install flask
+10. scp files from your local machine to ssh instance
+    * scp -r [directory] [name of instance]: (colon is intentional)
+11. Run app.py 
+    * python3 app.py
+12. Create a mapping between local computer and my computer
+    * By creating a tunnel
+    * This is done from my local computer
+    * If I don’t want to share the website to others
+    * From my local computer enter below
+    * ssh -NfL 5000:localhost:5000 webserver
+    * From my local computer’s browser, type localhost:5000
+13. To make it available to rest of the world
+    * need to install nginx
+    * sudo apt install nginx from ssh instance.
+    * Need to set up nginix to work with flask
+    * within ssh, go into /etc/nginx/sites-enabled/ directory
+    * sudo vi default
+    * Go to line 46 and comment it out (try_files etc…)
+    * then in the next line type: proxy_pass http://localhost:5000/:
+    * Get out of vi
+    * sudo systemctl restart nginx.service
+    * From any computer enter my public IP address of my EC2 instance onto the browser address.
+    * voila!
+14. Use tmux to start the ssh
+    * tmux to start the tmux session
+    * tmux attach (to get back to a closed tmux session)
+    * control B
+        * c - creates a new window
+        * [ - allows you to scroll up on your session
+        * z - pauses it
+        * x - kills tmux window
+    * escape to get out of bc
+15. sudo shutdown closes EC2 session.
+
+
+
+
