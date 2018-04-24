@@ -1,0 +1,121 @@
+AWS for sharing EC2 instance with other people
+•	Make a key pair and make sure each user you want to share the server with has it
+•	Send it over slack or other encrypted service
+•	chmod 400 key.pem
+•	Make an elastic address so the IP address of the server never changes
+o	Make elastic IP
+o	Allocate new address
+o	Assign it to the EC2 instance you want
+•	Got to atom ~/.ssh/config  and update the host/identity profile (update the IP address and also identity file)
+
+Editing an EC2 Instance
+•	Make link from home directory to another directory
+o	ln –s /directoryname linkname
+o	ln –s /directoryname directory   linkname 
+?	puts the link in the directory you want 
+
+•	add volume on console and attach to EC2 instance and it has to be in the same availability zone
+•	format the volume 
+o	mkfs –t ext4/dev/xvdf 
+•	list all block devices 
+o	lsblk
+•	make directory to mount new volumes
+o	mkdir /mnt/dirname
+•	 mount the volume to the directory you want it to be in 
+o	mount /dev/volname /mnt/dirname
+•	 edit fs tab so the mount stays
+o	/etc/fstab
+o	look at the line above to make sure it’s the same and everything is in place
+•	good idea to move files to the large volume or S3 bucket to keep memory free 
+o	in this example good idea to move everything to /mnt/
+
+S3 bucket notes
+
+•	Sharing a bucket with other people
+o	Look at bucket share profile settings notes 
+•	Looking at files in s3 buckets if you have permission 
+o	aws s3 ls s3://capstone-timesheet-data –-recursive
+
+•	deleting a folder
+o	aws s3 rm s3://capstone-timesheet-data/data/timesheet_log/
+
+
+
+To follow files and a script being run
+
+•	make logs directory
+o	python request_new_customfield_items.py 1>../logs/customfield_items.log  2>>../logs/customfield_items.log
+o	1> means all terminal scripts are put into that document
+o	2>> 2 means standard errors  and the >> means its all being appended
+o	> means overwrite
+o	>> means append
+
+•	get into the log directory 
+o	tail –f  * or tail –f  <filename>
+o	to look at last 10 lines 
+o	to look at top ten lines use head
+
+
+
+TMUX notes
+
+To view all sessions
+•	tmux ls
+
+to create a new named session, so it has a descriptive name and it’s easy to distinguish form others
+•	tmux new -s <session name>
+
+
+to attach to the specific session
+•	tmux a -t <session name
+
+
+
+bucket share profile
+
+{
+    "Version": "2012-10-17",
+    "Id": "Policy1521753196157",
+    "Statement": [
+        {
+            "Sid": "Stmt1521753194321",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                                  "arn:aws:iam::<account id>:user/<user>",
+                                  "arn:aws:iam::<account id>:user/<user>"
+                ]
+            },
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
+            ],
+            "Resource": "arn:aws:s3:::<bucket name>"
+        },
+        {
+            "Sid": "Stmt1521753194321a",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::<account id>:user/<user>",
+                    "arn:aws:iam::<account id>:user/<user>"
+                ]
+            },
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::<bucket name>/*"
+        }
+    ]
+}
+
+
+for ssh to ec2 instance from ubuntu without .ssh/config
+ssh -i ~/.ssh/puttytrial.pem ec2-user@ec2-18-188-139-54.us-east-2.compute.amazonaws.com
+
+for ssh using specific pem key to amazon linux server
+
+cat ~/.ssh/puttytrial.pem
+read what is inside pem key
